@@ -20,7 +20,7 @@ class Elementor_Tech_Radar_Widget extends \Elementor\Widget_Base {
     }
 
     public function get_script_depends(){
-        return ['d3-js','tech-radar-js'];
+        return ['tech-radar-js','d3-js']; 
     }
 
     public function get_style_depends(){
@@ -55,8 +55,7 @@ class Elementor_Tech_Radar_Widget extends \Elementor\Widget_Base {
             "Languages & Framework" => 0,
             "Platforms/Infrastructure" => 1,
             "Datastores" => 2,
-            "Data Management" => 3,
-            "Tools" => 4
+            "Tools" => 3
         ];
         $rings = [
             "ADOPT" => 0,
@@ -99,10 +98,9 @@ class Elementor_Tech_Radar_Widget extends \Elementor\Widget_Base {
 
                 var config = getRadarConfig();
                 config.quadrants = [
-                    { name: "Languages&Framework" },
+                    { name: "Languages & Framework" },
                     { name: "Platforms/Infrastructure" },
                     { name: "Datastores" },
-                    { name: "Data Management" },
                     { name: "Tools" }
                 ];
                 config.rings = [

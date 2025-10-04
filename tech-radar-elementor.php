@@ -53,7 +53,7 @@ function sanitize_tech_radar_options($input) {
     add_settings_error(
         'tech_radar_options',
         'saved',
-        "✅ Tech Radar settings saved successfully.",
+        "Successfully saved!",
         'updated'
     );
 
@@ -79,14 +79,13 @@ function render_tech_radar_settings_page() {
         ];
     }
 
-    $quadrants = ["Languages & Framework", "Platforms/Infrastructure", "Datastores", "Data Management", "Tools"];
+    $quadrants = ["Languages & Framework", "Platforms/Infrastructure", "Datastores", "Tools"];
     $rings = ["ADOPT", "TRIAL", "ASSESS", "HOLD"];
     $moved = ["No Change", "Up", "Down", "New"];
     ?>
     <div class="wrap">
         <h1>Tech Radar</h1>
 
-        <!-- Notifikasi -->
         <?php settings_errors(); ?>
 
         <form method="post" action="options.php">
