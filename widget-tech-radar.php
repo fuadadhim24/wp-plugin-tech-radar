@@ -1,87 +1,124 @@
 <?php
-if (!defined('ABSPATH')) {
-    exit;
-}
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Elementor_Tech_Radar_Widget extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
+class Elementor_Tech_Radar_Widget extends \Elementor\Widget_Base {
+
+    public function get_name() {
         return 'tech_radar';
     }
-    public function get_title()
-    {
+
+    public function get_title() {
         return 'Tech Radar';
     }
-    public function get_icon()
-    {
+
+    public function get_icon() {
         return 'eicon-integration';
     }
-    public function get_categories()
-    {
-        return ['general'];
+
+    public function get_categories() {
+        return [ 'general' ];
     }
 
-    public function get_script_depends()
-    {
-        return ['tech-radar-js','d3-js'];
+    public function get_script_depends(){
+        return ['d3-js','tech-radar-js'];
     }
-    public function get_style_depends()
-    {
+
+    public function get_style_depends(){
         return ['tech-radar-css'];
     }
 
-    /** Tidak ada kontrol entries di sini. Hanya info & date preview dari option. */
-    protected function register_controls()
-    {
-        $this->start_controls_section('section_general', ['label' => 'General']);
-        $this->add_control('notice', [
-            'label' => 'Info',
-            'type'  => \Elementor\Controls_Manager::RAW_HTML,
-            'raw'   => '<strong>Data radar diambil dari menu <em>Tech Radar</em> di Dashboard.</strong><br>Silakan isi Entries di sana. Widget ini hanya menampilkan hasilnya.',
-            'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
-        ]);
+    protected function register_controls() {
+        $this->start_controls_section(
+            'section_general',
+            [ 'label' => 'General' ]
+        );
+
+        $this->add_control(
+            'date',
+            [
+                'label' => 'Radar Date (ex: 2025.05)',
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => date('Y.m'),
+            ]
+        );
+
         $this->end_controls_section();
     }
 
-    protected function render()
-    {
-        if (!function_exists('tr_build_config')) {
-            echo '<p>Plugin belum lengkap: fungsi sumber data tidak ditemukan.</p>';
-            return;
+    protected function render() {
+        $settings = $this->get_settings_for_display();
+
+        $options = get_option('tech_radar_options', []);
+        $entries = [];
+
+        $quadrants = [
+            "Languages & Framework" => 0,
+            "Platforms/Infrastructure" => 1,
+            "Datastores" => 2,
+            "Data Management" => 3,
+            "Tools" => 4
+        ];
+        $rings = [
+            "ADOPT" => 0,
+            "TRIAL" => 1,
+            "ASSESS" => 2,
+            "HOLD" => 3
+        ];
+        $moved = [
+            "No Change" => 0,
+            "Up" => 1,
+            "Down" => -1,
+            "New" => 2
+        ];
+
+        if (!empty($options['entries'])) {
+            foreach ($options['entries'] as $entry) {
+                $entries[] = [
+                    'quadrant' => isset($quadrants[$entry['quadrant']]) ? $quadrants[$entry['quadrant']] : 0,
+                    'ring'     => isset($rings[$entry['ring']]) ? $rings[$entry['ring']] : 0,
+                    'label'    => $entry['label'],
+                    'moved'    => isset($moved[$entry['moved']]) ? $moved[$entry['moved']] : 0,
+                    'link'     => $entry['link'],
+                    'active'   => !empty($entry['active']),
+                ];
+            }
         }
 
-        $cfg = tr_build_config();
-
-        // Jika kamu ingin tetap menyematkan satu entry default (mis. AWS Glue) saat kosong:
-        if (empty($cfg['entries'])) {
-            $cfg['entries'][] = [
-                'label' => 'AWS Glue',
-                'quadrant' => 3,
-                'ring' => 2,
-                'moved' => 0,
-                'link'  => 'https://aws.amazon.com/glue/',
-                'active' => true,
-            ];
-        }
-
-        $json   = wp_json_encode($cfg);
-        $svg_id = 'radar-' . $this->get_id();
+        $svg_id = 'radar-' . $this->get_id(); 
         ?>
         <div class="tech-radar-widget">
-            <svg id="<?php echo esc_attr($svg_id); ?>"></svg>
+            <svg id="<?php echo esc_attr( $svg_id ); ?>"></svg>
         </div>
         <script>
         (function(){
-          function go(){
-            if (typeof radar_visualization !== 'function') { setTimeout(go,50); return; }
-            try {
-              var cfg = <?php echo $json; ?>;
-              cfg.svg = <?php echo wp_json_encode($svg_id); ?>;
-              radar_visualization(cfg);
-            } catch(e){ console.error('Radar error (widget)', e); }
-          }
-          go();
+            function runWhenReady() {
+                if (typeof radar_visualization !== 'function' || typeof getRadarConfig !== 'function') {
+                    setTimeout(runWhenReady, 50);
+                    return;
+                }
+
+                var config = getRadarConfig();
+                config.quadrants = [
+                    { name: "Languages&Framework" },
+                    { name: "Platforms/Infrastructure" },
+                    { name: "Datastores" },
+                    { name: "Data Management" },
+                    { name: "Tools" }
+                ];
+                config.rings = [
+                    { name: "ADOPT", color: "#5ba300" },
+                    { name: "TRIAL", color: "#009eb0" },
+                    { name: "ASSESS", color: "#c7ba00" },
+                    { name: "HOLD", color: "#e09b96" },
+                ];
+
+                config.date = <?php echo wp_json_encode( $settings['date'] ); ?>;
+                config.entries = <?php echo wp_json_encode( $entries ); ?>;
+                config.svg = <?php echo wp_json_encode( $svg_id ); ?>;
+
+                radar_visualization(config);
+            }
+            runWhenReady();
         })();
         </script>
         <?php

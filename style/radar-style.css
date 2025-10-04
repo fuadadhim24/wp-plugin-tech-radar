@@ -14,10 +14,15 @@
     visibility: visible;
 }
 
+.tech-radar-entry .remove-entry {
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
 @media (max-width: 767px) {
-  /* .tech-radar-widget svg {
+  .tech-radar-widget svg {
     display: none !important;
-  } */
+  }
   .tech-radar-list {
     display: block !important;
     padding: 16px;
@@ -40,19 +45,4 @@
     font-size: 12px;
     color: #666;
   }
-
-.tech-radar-widget {
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;   /* SVG di tengah horizontal */
-  align-items: center;       /* kalau butuh vertical center */
-}
-
-.tech-radar-widget svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
 }
