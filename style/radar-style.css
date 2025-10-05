@@ -14,35 +14,59 @@
     visibility: visible;
 }
 
+
+.tech-radar-widget {
+  padding-left: 24px;
+  padding-right: 64px;
+  overflow-x: auto; /* supaya ga meledak kalau tetap overflow */
+}
+
+.tech-radar-widget svg {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
 .tech-radar-entry .remove-entry {
     margin-left: 10px;
     vertical-align: middle;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Varela&display=swap');
 @media (max-width: 767px) {
   .tech-radar-widget svg {
     display: none !important;
   }
   .tech-radar-list {
     display: block !important;
+    font-family: 'Open Sans', sans-serif;
     padding: 16px;
-    font-family: Arial, sans-serif;
   }
-  .tech-radar-list ul {
-    list-style: none;
-    padding: 0;
+  /* Spasi antar entri */
+  .tech-radar-list-view > div > div {
+    margin-bottom: 5px; /* atau 12px jika mau lebih lega */
   }
-  .tech-radar-list li {
-    margin-bottom: 12px;
-    padding: 8px;
-    border-left: 4px solid #ccc;
-    background-color: #f9f9f9;
+
+ 
+.tech-radar-list-view h3 {
+  word-break: break-word;
+  white-space: normal;
+  font-family: 'Varela', sans-serif;
+  font-size: 26px;
+  margin-top: 10px;
+
+}
+  .tech-radar-list-view strong {
+    font-family: 'Varela', sans-serif;
+    font-size: 20px;
+    display: block;
+    margin: 12px 0 4px;
   }
-  .tech-radar-list li .label {
-    font-weight: bold;
-  }
-  .tech-radar-list li .meta {
-    font-size: 12px;
-    color: #666;
-  }
+
+.tech-radar-list-view h3::after {
+  content: "";
+  display: block;
+}
+
+
 }
