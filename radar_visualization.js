@@ -31,12 +31,13 @@ function radar_visualization(config) {
     "print_ring_descriptions_table" in config
       ? config.print_ring_descriptions_table
       : false;
-  config.legend_offset = config.legend_offset || [
-    { x: 450, y: 90 },
-    { x: -675, y: 90 },
-    { x: -675, y: -310 },
-    { x: 450, y: -310 },
-  ];
+config.legend_offset = config.legend_offset || [
+  { x: 450, y: 90 },   // kanan atas  (Tools)
+  { x: -675, y: 90 },  // kiri atas   (Datastores)
+  { x: -675, y: -310 },// kiri bawah  (Platforms / Infrastructure)
+  { x: 450, y: -310 }, // kanan bawah (Languages / Framework)
+];
+
   config.title_offset = config.title_offset || { x: -675, y: -420 };
   config.footer_offset = config.footer_offset || { x: -245, y: 450 };
   config.legend_column_width = config.legend_column_width || 150;
@@ -320,16 +321,29 @@ function radar_visualization(config) {
       .style("font-size", "30")
       .style("font-weight", "bold");
 
-    radar
-      .append("text")
-      .attr(
-        "transform",
-        translate(config.title_offset.x, config.title_offset.y + 20)
-      )
-      .text(config.date || "")
-      .style("font-family", config.font_family)
-      .style("font-size", "14px")
-      .style("fill", "#999");
+    // radar
+    //   .append("text")
+    //   .attr(
+    //     "transform",
+    //     translate(config.title_offset.x, config.title_offset.y - 30)
+    //   )
+    //   .text(config.date || "")
+    //   .style("font-family", config.font_family)
+    //   .style("font-size", "14px")
+    //   .style("fill", "#999");
+
+// Ganti bagian tanggal
+radar
+  .append("text")
+  .attr(
+    "transform",
+    translate(config.title_offset.x, config.title_offset.y - (80 / config.scale))
+  )
+  .text(config.date || "")
+  .style("font-family", config.font_family)
+  .style("font-size", "14px")
+  .style("fill", "#999")
+  .style("pointer-events", "none");
 
     radar
       .append("text")
@@ -676,4 +690,22 @@ function radar_visualization(config) {
   if (config.print_ring_descriptions_table) {
     ringDescriptionsTable();
   }
+// --- pastikan tanggal muncul di atas semua elemen SVG ---
+setTimeout(() => {
+  const svg = document.querySelector("svg#radar");
+  if (svg) {
+    const texts = svg.querySelectorAll("text");
+    texts.forEach(t => {
+      t.style.pointerEvents = "none";
+      t.style.isolation = "isolate";
+      t.style.zIndex = "9999";
+    });
+
+    // khusus tanggal, angkat ke paling atas
+    const dateText = Array.from(texts).find(t => t.textContent.includes("."));
+    if (dateText) svg.appendChild(dateText);
+  }
+}, 300);
+
+
 }
