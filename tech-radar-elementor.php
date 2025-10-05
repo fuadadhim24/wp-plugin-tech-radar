@@ -10,38 +10,41 @@
  * Text Domain: elementor-tech-radar-widget
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (! defined('ABSPATH')) {
+    exit;
+}
 
-add_action( 'elementor/widgets/register', function( $widgets_manager ) {
+add_action('elementor/widgets/register', function ($widgets_manager) {
     require_once __DIR__ . '/widget-tech-radar.php';
-    $widgets_manager->register( new \Elementor_Tech_Radar_Widget() );
-} );
-
-add_action( 'wp_enqueue_scripts', function() {
-    wp_enqueue_script( 'd3-js', 'https://d3js.org/d3.v7.min.js', [], null, true );
-    wp_enqueue_script( 'tech-radar-js', plugin_dir_url( __FILE__ ) . 'radar_visualization.js', [ 'd3-js' ], null, true );
-    wp_enqueue_style( 'tech-radar-css', plugin_dir_url( __FILE__ ) . 'style/radar-style.css' );
+    $widgets_manager->register(new \Elementor_Tech_Radar_Widget());
 });
 
-add_action('admin_menu', function() {
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_script('d3-js', 'https://d3js.org/d3.v7.min.js', [], null, true);
+    wp_enqueue_script('tech-radar-js', plugin_dir_url(__FILE__) . 'radar_visualization.js', [ 'd3-js' ], null, true);
+    wp_enqueue_style('tech-radar-css', plugin_dir_url(__FILE__) . 'style/radar-style.css');
+});
+
+add_action('admin_menu', function () {
     add_menu_page(
-        'Tech Radar',                  
-        'Tech Radar',                  
-        'manage_options',              
-        'tech-radar',                  
-        'render_tech_radar_settings_page', 
-        'dashicons-chart-pie',         
-        30                             
+        'Tech Radar',
+        'Tech Radar',
+        'manage_options',
+        'tech-radar',
+        'render_tech_radar_settings_page',
+        'dashicons-chart-pie',
+        30
     );
 });
 
-add_action('admin_init', function() {
+add_action('admin_init', function () {
     register_setting('tech_radar_group', 'tech_radar_options', [
         'sanitize_callback' => 'sanitize_tech_radar_options'
     ]);
 });
 
-function sanitize_tech_radar_options($input) {
+function sanitize_tech_radar_options($input)
+{
     if (!empty($input['entries'])) {
         foreach ($input['entries'] as $i => $entry) {
             if (empty($entry['label'])) {
@@ -60,7 +63,8 @@ function sanitize_tech_radar_options($input) {
     return $input;
 }
 
-function render_tech_radar_settings_page() {
+function render_tech_radar_settings_page()
+{
     $options = get_option('tech_radar_options', []);
 
     if (empty($options)) {
@@ -190,5 +194,37 @@ function render_tech_radar_settings_page() {
         });
     })(jQuery);
     </script>
+
+    <?php if (wp_is_mobile()) : ?>
+  <div class="tech-radar-mobile-list">
     <?php
+    $entries = get_option('tech_radar_entries'); // Atau array dari plugin kamu
+        $grouped = [];
+
+        foreach ($entries as $entry) {
+            $grouped[$entry['quadrant']][$entry['ring']][] = $entry;
+        }
+
+        $quadrants = ['Languages & Framework', 'Tools', 'Datastores', 'Platforms/Infrastructure'];
+        $rings = ['ADOPT', 'TRIAL', 'ASSESS', 'HOLD'];
+
+        foreach ($quadrants as $q_index => $q_name) {
+            echo "<h3>$q_name</h3>";
+            foreach ($rings as $r_index => $ring_name) {
+                if (!empty($grouped[$q_index][$r_index])) {
+                    echo "<strong>$ring_name</strong><ul>";
+                    foreach ($grouped[$q_index][$r_index] as $entry) {
+                        echo "<li>{$entry['label']}</li>";
+                    }
+                    echo "</ul>";
+                }
+            }
+        }
+        ?>
+  </div>
+<?php endif; ?>
+
+    <?php
+
+
 }
