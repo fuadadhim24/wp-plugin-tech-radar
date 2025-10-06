@@ -7,7 +7,7 @@ function getRadarConfig() {
   } else if (w >= 768) {
     return { width: 1550, height: 1000, scale: 0.45 }; // Tablet
   } else {
-    return { width: 1550, height: 1000, scale: 0.2 }; // Mobile
+    return { width: 1450, height: 1000, scale: 0.2 }; // Mobile
   }
 }
 
